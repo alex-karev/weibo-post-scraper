@@ -5,19 +5,20 @@ Quick node js script utilizing puppeteer for parsing posts from weibo.
 ## Installation
 
 ```bash
-npm init
+git clone https://github.com/alex-karev/weibo-post-scraper
+cd weibo-post-scraper
 npm install
 ```
 
 ## Usage
 
-Login to your weibo account, set queries and number of pages to parse. Then run:
+Set queries and number of pages to parse in `index.js`. Then run:
 
 ```bash
 npm run start
 ```
 
-You will find your data in <QUERY>.csv files
+Login yo your account. Scraping will start automatically. You will find your data in <QUERY>.csv files
 
 ## TODO
 

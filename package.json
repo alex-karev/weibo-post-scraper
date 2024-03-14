@@ -1,7 +1,7 @@
 {
-  "name": "weibo-parser",
+  "name": "weibo-post-scraper",
   "version": "1.0.0",
-  "description": "",
+  "description": "Quick node js script utilizing puppeteer for parsing posts from weibo.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,6 +12,6 @@
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "Alex Karev",
+  "license": "GNU GPL 3.0"
 }
