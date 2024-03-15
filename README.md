@@ -1,6 +1,14 @@
-# Weibo puppeteer parser
+# Weibo puppeteer scraper
 
-Quick node js script utilizing puppeteer for parsing posts from weibo.
+Quick node js script utilizing puppeteer for scraping posts from weibo.
+
+## Features
+
+- Cookies are saved **automatically** after you login to your account.
+- Cookies can be **reused** across runs using `-s/--skiplogin` flag.
+- Puppeteer **stealth** plugin is used.
+- **Multiple keywords** and adjustable number of pages.
+- Output to **csv**.
 
 ## Installation
 
@@ -11,8 +19,6 @@ npm install
 ```
 
 ## Usage
-
-Set queries and number of pages to parse in `index.js`. Then run:
 
 ```bash
 npm start -- [ARGUMENTS] -k [KEYWORDS]
