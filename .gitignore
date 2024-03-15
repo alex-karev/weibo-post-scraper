@@ -2,3 +2,4 @@ node_modules/
 *.csv
 cookies.txt
 package-lock.json
+output/

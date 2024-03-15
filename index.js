@@ -1,113 +1,58 @@
-// Constants
-const queries = ["X疾病"];
-const maxPages = 5;
-const reLogin = true;
-
 // Init modules
-const puppeteer = require("puppeteer-extra");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-puppeteer.use(StealthPlugin());
-const fs = require('node:fs/promises');
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+const argv = require('minimist')(process.argv.slice(2));
+const fs = require('fs');
+const {weiboScraper} = require("./weibo-scraper.js");
 
-// Parse single max
-async function parsePage(page) {
-  // Get content
-  const items = await page.evaluate(() => {
-    var newItems = [];
-    const cards = document.querySelectorAll("div[action-type='feed_list_item']");
-    // Loop through each card
-    cards.forEach(card => {
-      var text = "";
-      // Define content and ful content
-      const content = card.querySelector("p[node-type='feed_list_content']");
-      const contentFull = card.querySelector("p[node-type='feed_list_content_full']");
-      // Add data depending on content type
-      if (contentFull !== null) {
-        text = contentFull.innerText;
-      } else if (content !== null) {
-        text = content.innerText;
-      }
-      // Clear output
-      text = text
-        .trim()
-        .replace(/\n|\r/g, "")
-      if (text.length > 0) {
-        newItems.push(text);
-      }
-    })
-    return newItems
-  });
-  // Log items
-  console.log("Got " + items.length.toString() + " items.");
-  return items
+// Parameters
+let keywords = [];
+let maxPages = 5;
+let skipLogin = false;
+let outputDir = "output";
+let loginTimeout = 30000;
+
+// Help
+if (argv.h !== undefined || argv.help !== undefined) {
+  console.log(
+    "Collects contents of weibo posts based on a list of keywords",
+    "\n\nUSAGE: npm start -- [ARGUMENTS] -k [KEYWORDS]",
+    "\n\nARGUMENTS:",
+    "\n  -k  --keywords    Keywords for search (e.g. word1,word2,word3)",
+    "\n  -p  --pages       Maximum number of pages (default: 5)",
+    "\n  -s  --skiplogin   Skip login procedure, use saved cookies",
+    "\n  -t  --timeout     Login timeout in milliseconds (default: 30000)",
+    "\n  -o  --output      Output directory (default: output)",
+    "\n  -h  --help        Print this message",
+    "\n"
+  );
+  process.exit();
 }
 
-// Main function
-async function parse() {
-  // Open browse
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
-  await page.setViewport({ width: 1400, height: 1024 });
-  let cookies = null;
-  if (reLogin) {
-    // Login
-    await page.goto("https://passport.weibo.com/sso/signin");
-    console.log("Waiting for login...");
-    // Wait for user to login
-    await sleep(30000);
-    // Save cookies
-    const newCookies = await page.cookies();
-    cookies = newCookies;
-    fs.writeFile('cookies.txt', JSON.stringify(newCookies), err => {
-      if (err) {
-        console.error(err);
-      } else {
-        console.log("Cookies are saved!");
-      }
-    });
-  } else {
-    // Load cookies
-    const newCookies = await fs.readFile('cookies.txt', 'utf8');
-    cookies = JSON.parse(newCookies);
-  }
-  // Set Cookies
-  await page.setCookie(...cookies);
-  for (var i = 0; i < queries.length; i++) {
-    // Search for query
-    const query = queries[i];
-    var items = [];
-    // Search for query
-    await page.goto("https://s.weibo.com/weibo?q=" + query);
-    // Loop through pages
-    for (var j = 0; j < maxPages; j++) {
-      console.log("Loading page: " + (j + 1).toString());
-      const pageItems = await parsePage(page, query);
-      items.push(...pageItems);
-      if (j >= maxPages - 1) {
-        break
-      }
-      const nextButton = ".next";
-      await page.waitForSelector(nextButton);
-      await page.click(nextButton);
-      await sleep(1000);
-    }
-    // Serialize data
-    var output = "";
-    for (var j = 0; j < items.length; j++) {
-      output += items[j] + "\n";
-    }
-    // Save items
-    fs.writeFile(query + '.csv', output, err => {
-      if (err) {
-        console.error(err);
-      }
-    });
-    console.log("Items are saved to " + query + ".csv");
-  }
-  // Close browser
-  await browser.close();
+// Parse arguments
+maxPages = (argv.p !== undefined) ? Number(argv.p) : maxPages;
+maxPages = (argv.pages !== undefined) ? Number (argv.pages) : maxPages;
+skipLogin = (argv.s !== undefined) ? true : skipLogin;
+skipLogin = (argv.skiplogin !== undefined) ? true : skipLogin;
+outputDir = (argv.output !== undefined && typeof argv.output === "string") ? argv.output : outputDir;
+outputDir = (argv.o !== undefined && typeof argv.o === "string") ? argv.o : outputDir;
+loginTimeout = (argv.t !== undefined) ? Number(argv.t) : loginTimeout;
+loginTimeout = (argv.timeout !== undefined) ? Number (argv.timeout) : loginTimeout;
+
+// Get keywords
+let keywordString = ""
+keywordString = (argv.k !== undefined && typeof argv.k === "string") ? argv.k : keywordString;
+keywordString = (argv.keywords !== undefined && typeof argv.keywords === "string") ? argv.keywords : keywordString;
+
+// Parse keywords
+if (keywordString.length === 0) {
+  console.log("Error! No keywords specified","\nUse -h/--help for help.");
+  process.exit();
+}
+keywords = keywordString.split(",");
+
+// Create output directory if it does not exist
+if (!fs.existsSync(outputDir)){
+    fs.mkdirSync(outputDir);
 }
 
-// Entry point
-parse();
+// Start scraping
+weiboScraper({keywords, maxPages, skipLogin, loginTimeout, outputDir});

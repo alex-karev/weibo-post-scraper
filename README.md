@@ -15,14 +15,21 @@ npm install
 Set queries and number of pages to parse in `index.js`. Then run:
 
 ```bash
-npm run start
+npm start -- [ARGUMENTS] -k [KEYWORDS]
 ```
 
-Login yo your account. Scraping will start automatically. You will find your data in <QUERY>.csv files
+Example:
+
+```bash
+npm start -- --help
+npm start -- -p 20 -t 10000 -k one,two,three
+```
+
+Login yo your account. Scraping will start automatically after some timeout. You will find your data in <OUTPUT>/<QUERY>.csv files
 
 ## TODO
 
-- [ ] Set parameters via cli arguments instead of constants.
+- [x] Set parameters via cli arguments instead of constants.
 - [ ] Error detection and prevention.
 - [ ] Use puppeteer-cluster
 
@@ -36,4 +43,4 @@ BTC: 32F3zAnQQGwZzsG7R35rPUS269Xz11cZ8B
 
 ## License
 
-See `LICENSE`
+Free to use under GNU GPL 3.0. See [LICENSE](https://github.com/alex-karev/weibo-post-scraper/blob/main/LICENSE) for more information.
