@@ -1,11 +1,11 @@
-# Weibo puppeteer scraper
+# Weibo Post Scraper
 
 Quick node js script utilizing puppeteer for scraping posts from weibo.
 
 ## Features
 
 - Cookies are saved **automatically** after you login to your account.
-- Cookies can be **reused** across runs using `-s/--skiplogin` flag.
+- Cookies can be **reused** across multiple runs using `-s/--skiplogin` flag.
 - Puppeteer **stealth** plugin is used.
 - **Multiple keywords** and adjustable number of pages.
 - Output to **csv**.
@@ -29,9 +29,13 @@ Example:
 ```bash
 npm start -- --help
 npm start -- -p 20 -t 10000 -k one,two,three
+npm start -- --skiplogin --pages 5 --keywords four,five,six
 ```
 
-Login yo your account. Scraping will start automatically after some timeout. You will find your data in <OUTPUT>/<QUERY>.csv files
+1. Run script. 
+2. Login to your account. 
+3. Scraping will start automatically after some time.
+4. Data is saved to <OUTPUT>/<QUERY>.csv files.
 
 ## TODO
 
@@ -43,7 +47,7 @@ Login yo your account. Scraping will start automatically after some timeout. You
 
 Feel free to fork this repo and make pull requests.
 
-If you like my work, support it:
+If you like my work, please, support me:
 
 BTC: 32F3zAnQQGwZzsG7R35rPUS269Xz11cZ8B
 
