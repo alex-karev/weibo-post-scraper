@@ -40,7 +40,8 @@ npm start -- --skiplogin --pages 5 --keywords four,five,six
 ## TODO
 
 - [x] Set parameters via cli arguments instead of constants.
-- [ ] Error detection and prevention.
+- [x] Error handling.
+- [ ] Replace CSV with a better output format.
 - [ ] Use puppeteer-cluster
 
 ## Contribution

@@ -9,6 +9,7 @@ let maxPages = 5;
 let skipLogin = false;
 let outputDir = "output";
 let loginTimeout = 30000;
+let headless = false;
 
 // Help
 if (argv.h !== undefined || argv.help !== undefined) {
@@ -21,6 +22,7 @@ if (argv.h !== undefined || argv.help !== undefined) {
     "\n  -s  --skiplogin   Skip login procedure, use saved cookies",
     "\n  -t  --timeout     Login timeout in milliseconds (default: 30000)",
     "\n  -o  --output      Output directory (default: output)",
+    "\n  -d  --headless    Run puppeteer in headless mode",
     "\n  -h  --help        Print this message",
     "\n"
   );
@@ -30,12 +32,12 @@ if (argv.h !== undefined || argv.help !== undefined) {
 // Parse arguments
 maxPages = (argv.p !== undefined) ? Number(argv.p) : maxPages;
 maxPages = (argv.pages !== undefined) ? Number (argv.pages) : maxPages;
-skipLogin = (argv.s !== undefined) ? true : skipLogin;
-skipLogin = (argv.skiplogin !== undefined) ? true : skipLogin;
+skipLogin = argv.s !== undefined || argv.skiplogin !== undefined;
 outputDir = (argv.output !== undefined && typeof argv.output === "string") ? argv.output : outputDir;
 outputDir = (argv.o !== undefined && typeof argv.o === "string") ? argv.o : outputDir;
 loginTimeout = (argv.t !== undefined) ? Number(argv.t) : loginTimeout;
 loginTimeout = (argv.timeout !== undefined) ? Number (argv.timeout) : loginTimeout;
+headless = argv.d !== undefined || argv.headless !== undefined
 
 // Get keywords
 let keywordString = ""
@@ -55,4 +57,4 @@ if (!fs.existsSync(outputDir)){
 }
 
 // Start scraping
-weiboScraper({keywords, maxPages, skipLogin, loginTimeout, outputDir});
+weiboScraper({keywords, maxPages, skipLogin, loginTimeout, outputDir, headless});

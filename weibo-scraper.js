@@ -3,7 +3,7 @@ const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 puppeteer.use(StealthPlugin());
 const fs = require('node:fs/promises');
-const {join} = require("node:path");
+const { join } = require("node:path");
 
 // Helper functions
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -42,10 +42,10 @@ async function loadItems(page) {
 }
 
 // Main function
-async function weiboScraper({keywords, maxPages, skipLogin, loginTimeout, outputDir}) {
+async function weiboScraper({ keywords, maxPages, skipLogin, loginTimeout, outputDir, headless }) {
   // Open browse
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
+  const browser = await puppeteer.launch({ headless: headless })
+  const page = await browser.newPage()
   await page.setViewport({ width: 1400, height: 1024 });
   let cookies = null;
   const cookiesPath = join(outputDir, "cookies.txt");
@@ -75,22 +75,46 @@ async function weiboScraper({keywords, maxPages, skipLogin, loginTimeout, output
   for (var i = 0; i < keywords.length; i++) {
     // Search for query
     const query = keywords[i];
-    const outputPath = join(outputDir, query+".csv");
+    const outputPath = join(outputDir, query + ".csv");
     var items = [];
     // Search for query
-    await page.goto("https://s.weibo.com/weibo?q=" + query);
+    const pageLoaded = await page.goto("https://s.weibo.com/weibo?q=" + query)
+      .catch((e) => console.log(e))
+      .then(() => { return true });
+    // Failed to search keyword
+    if (!pageLoaded) {
+      console.log("Error! Failed to load results for keyword: " + query);
+      continue
+    }
     // Loop through pages
     for (var j = 0; j < maxPages; j++) {
+      // Wait for posts to appear
+      const postsAppeared = await page.waitForSelector("div[action-type='feed_list_item']");
+      if (!postsAppeared) {
+        console.log("Error! No posts on page " + (j + 1).toString() +
+          "for keyword: " + query + "!");
+        break
+      }
+      // Load items
       console.log("Loading page: " + (j + 1).toString());
       const pageItems = await loadItems(page, query);
       items.push(...pageItems);
+      // Stop clicking "next" button if this page is the last one
       if (j >= maxPages - 1) {
         break
       }
+      // Wait for the "next" button
       const nextButton = ".next";
-      await page.waitForSelector(nextButton);
+      const nextButtonAppeared = await page.waitForSelector(nextButton)
+        .catch((e) => console.log(e))
+        .then(() => { return true });
+      if (!nextButtonAppeared) {
+        console.log("Error! No 'next' button on page " +
+          (j + 1).toString() + " for keyword: " + query + "!");
+        break
+      }
+      // Click the "next" button
       await page.click(nextButton);
-      await sleep(1000);
     }
     // Serialize data
     var output = "";
