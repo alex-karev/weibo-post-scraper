@@ -42,6 +42,7 @@ npm start -- --skiplogin --pages 5 --keywords four,five,six
 - [x] Set parameters via cli arguments instead of constants.
 - [x] Error handling.
 - [ ] Replace CSV with a better output format.
+- [ ] Add support for importing keywords from a file.
 - [ ] Use puppeteer-cluster
 
 ## Contribution

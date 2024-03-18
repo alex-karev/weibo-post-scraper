@@ -1,6 +1,6 @@
 {
   "name": "weibo-post-scraper",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Quick node js script utilizing puppeteer for parsing posts from weibo.",
   "main": "index.js",
   "scripts": {

@@ -30,6 +30,7 @@ async function loadItems(page) {
       text = text
         .trim()
         .replace(/\n|\r/g, "")
+        .replace("\u200b", "")
       if (text.length > 0) {
         newItems.push(text);
       }
@@ -68,14 +69,14 @@ async function weiboScraper({ keywords, maxPages, skipLogin, loginTimeout, outpu
   } else {
     // Load cookies
     const newCookies = await fs.readFile(cookiesPath, 'utf8');
-    cookies = JSON.weiboScraper(newCookies);
+    cookies = JSON.parse(newCookies);
   }
   // Set Cookies
   await page.setCookie(...cookies);
   for (var i = 0; i < keywords.length; i++) {
     // Search for query
     const query = keywords[i];
-    const outputPath = join(outputDir, query + ".csv");
+    const outputPath = join(outputDir, query + ".json");
     var items = [];
     // Search for query
     const pageLoaded = await page.goto("https://s.weibo.com/weibo?q=" + query)
@@ -116,13 +117,8 @@ async function weiboScraper({ keywords, maxPages, skipLogin, loginTimeout, outpu
       // Click the "next" button
       await page.click(nextButton);
     }
-    // Serialize data
-    var output = "";
-    for (var j = 0; j < items.length; j++) {
-      output += items[j] + "\n";
-    }
     // Save items
-    fs.writeFile(outputPath, output, err => {
+    fs.writeFile(outputPath, JSON.stringify(items, null, 2), err => {
       if (err) {
         console.error(err);
       }
