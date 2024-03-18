@@ -8,6 +8,7 @@ let keywords = [];
 let maxPages = 5;
 let skipLogin = false;
 let outputDir = "output";
+let inputPath = "input";
 let loginTimeout = 30000;
 let headless = false;
 
@@ -16,8 +17,10 @@ if (argv.h !== undefined || argv.help !== undefined) {
   console.log(
     "Collects contents of weibo posts based on a list of keywords",
     "\n\nUSAGE: npm start -- [ARGUMENTS] -k [KEYWORDS]",
+    "\n\n       npm start -- [ARGUMENTS] -i [INPUT_FILE]",
     "\n\nARGUMENTS:",
     "\n  -k  --keywords    Keywords for search (e.g. word1,word2,word3)",
+    "\n  -i  --input       Input file where every line is a keyword",
     "\n  -p  --pages       Maximum number of pages (default: 5)",
     "\n  -s  --skiplogin   Skip login procedure, use saved cookies",
     "\n  -t  --timeout     Login timeout in milliseconds (default: 30000)",
@@ -43,13 +46,23 @@ headless = argv.d !== undefined || argv.headless !== undefined
 let keywordString = ""
 keywordString = (argv.k !== undefined && typeof argv.k === "string") ? argv.k : keywordString;
 keywordString = (argv.keywords !== undefined && typeof argv.keywords === "string") ? argv.keywords : keywordString;
+if (keywordString.length > 0) {
+  keywords = keywordString.split(",");
+}
 
-// Parse keywords
-if (keywordString.length === 0) {
+// Read keywords from file
+inputPath = (argv.i !== undefined) ? argv.i : inputPath;
+inputPath = (argv.input !== undefined) ? argv.input : inputPath;
+if (inputPath.length > 0 && fs.existsSync(inputPath)) {
+    const newKeywords = fs.readFileSync(inputPath, 'utf8').trim().split("\n");
+    keywords = keywords.concat(newKeywords);
+}
+
+// Stop if no keywords
+if (keywords.length === 0) {
   console.log("Error! No keywords specified","\nUse -h/--help for help.");
   process.exit();
 }
-keywords = keywordString.split(",");
 
 // Create output directory if it does not exist
 if (!fs.existsSync(outputDir)){

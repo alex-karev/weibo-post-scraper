@@ -35,14 +35,15 @@ npm start -- --skiplogin --pages 5 --keywords four,five,six
 1. Run script. 
 2. Login to your account. 
 3. Scraping will start automatically after some time.
-4. Data is saved to <OUTPUT>/<QUERY>.csv files.
+4. Data is saved to <OUTPUT>/<QUERY>.json files.
 
 ## TODO
 
 - [x] Set parameters via cli arguments instead of constants.
 - [x] Error handling.
-- [ ] Replace CSV with a better output format.
-- [ ] Add support for importing keywords from a file.
+- [x] Replace CSV with a better output format.
+- [x] Add support for importing keywords from a file.
+- [ ] Save additional data (author, comments, likes, etc.)
 - [ ] Use puppeteer-cluster
 
 ## Contribution
